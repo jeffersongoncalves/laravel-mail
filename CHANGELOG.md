@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-mail` will be documented in this file.
 
+## 1.3.1 - 2026-04-26
+
+**Full Changelog**: https://github.com/jeffersongoncalves/laravel-mail/compare/1.3.0...1.3.1
+
 ## 1.3.0 - 2026-04-05
 
 ### What's Changed
@@ -22,6 +26,7 @@ All notable changes to `laravel-mail` will be documented in this file.
 LARAVEL_MAIL_PIXEL_OPEN_TRACKING=true
 LARAVEL_MAIL_PIXEL_CLICK_TRACKING=true
 LARAVEL_MAIL_PIXEL_SIGNING_KEY=  # optional, defaults to APP_KEY
+
 
 ```
 #### New Files
