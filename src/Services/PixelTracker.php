@@ -63,6 +63,12 @@ class PixelTracker
 
     public static function isUrlSafe(string $url): bool
     {
+        // Reject protocol-relative URLs (e.g. "//evil.com") which would
+        // otherwise be parsed without a scheme and allow an open redirect.
+        if (str_starts_with($url, '//')) {
+            return false;
+        }
+
         $parsed = parse_url($url);
 
         if ($parsed === false) {
@@ -71,11 +77,9 @@ class PixelTracker
 
         $scheme = strtolower($parsed['scheme'] ?? '');
 
-        if (in_array($scheme, ['javascript', 'data', 'vbscript', 'blob'], true)) {
-            return false;
-        }
-
-        return in_array($scheme, ['http', 'https', ''], true);
+        // Only absolute http/https URLs are allowed. Scheme-less (relative) URLs
+        // and dangerous pseudo-schemes are rejected to prevent open redirects.
+        return in_array($scheme, ['http', 'https'], true);
     }
 
     protected function sign(string $data): string

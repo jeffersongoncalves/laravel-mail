@@ -104,9 +104,24 @@ return [
         'providers' => [
             'ses' => [
                 'enabled' => false,
+
+                /*
+                | Verify the SNS message signature on every incoming webhook.
+                | When enabled, requests with a missing/invalid signature or a
+                | SigningCertURL that is not a legitimate AWS SNS endpoint are
+                | rejected (fail closed). Strongly recommended in production.
+                */
+                'verify_signature' => env('LARAVEL_MAIL_SES_VERIFY_SIGNATURE', false),
             ],
             'sendgrid' => [
                 'enabled' => false,
+
+                /*
+                | ECDSA public key ("Verification Key") from the SendGrid Event
+                | Webhook settings. When set, the X-Twilio-Email-Event-Webhook-*
+                | signature is verified; missing/invalid signatures are rejected.
+                */
+                'verification_key' => env('LARAVEL_MAIL_SENDGRID_VERIFICATION_KEY'),
                 'signing_secret' => env('LARAVEL_MAIL_SENDGRID_SIGNING_SECRET'),
             ],
             'postmark' => [

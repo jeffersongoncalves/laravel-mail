@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use JeffersonGoncalves\LaravelMail\Enums\TrackingEventType;
 use JeffersonGoncalves\LaravelMail\Enums\TrackingProvider;
+use JeffersonGoncalves\WebhookSignatures\Verifiers\SendGridSignatureVerifier;
 
 class SendGridWebhookHandler extends AbstractWebhookHandler
 {
@@ -16,24 +17,21 @@ class SendGridWebhookHandler extends AbstractWebhookHandler
 
     public function validate(Request $request): bool
     {
-        $signingSecret = config('laravel-mail.tracking.providers.sendgrid.signing_secret');
+        // The "verification key" is the ECDSA public key SendGrid provides in the
+        // Event Webhook settings. Fall back to the legacy `signing_secret` key.
+        $verificationKey = config('laravel-mail.tracking.providers.sendgrid.verification_key')
+            ?? config('laravel-mail.tracking.providers.sendgrid.signing_secret');
 
-        if (! $signingSecret) {
+        // Signature verification is opt-in: when no key is configured we accept
+        // the request (consistent with the other providers). When a key is set,
+        // delegate the actual ECDSA (P-256/SHA-256) check to the shared
+        // jeffersongoncalves/laravel-webhook-signatures verifier, which fails
+        // closed on any missing header, malformed payload or invalid signature.
+        if (! $verificationKey || ! is_string($verificationKey)) {
             return true;
         }
 
-        $signature = $request->header('X-Twilio-Email-Event-Webhook-Signature');
-        $timestamp = $request->header('X-Twilio-Email-Event-Webhook-Timestamp');
-
-        if (! $signature || ! $timestamp) {
-            return false;
-        }
-
-        // SendGrid uses ECDSA with the verification key (public key)
-        // For simplicity, we verify the timestamp is recent (within 5 minutes)
-        $timestampAge = abs(time() - (int) $timestamp);
-
-        return $timestampAge <= 300;
+        return (new SendGridSignatureVerifier)->verify($request, $verificationKey);
     }
 
     public function handle(Request $request): void

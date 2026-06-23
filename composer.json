@@ -31,8 +31,10 @@
         "illuminate/database": "^11.0|^12.0|^13.0",
         "illuminate/mail": "^11.0|^12.0|^13.0",
         "illuminate/support": "^11.0|^12.0|^13.0",
+        "jeffersongoncalves/laravel-webhook-signatures": "^1.0",
         "spatie/laravel-package-tools": "^1.16",
-        "spatie/laravel-translatable": "^6.6"
+        "spatie/laravel-translatable": "^6.6",
+        "tijsverkoyen/css-to-inline-styles": "^2.2"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",

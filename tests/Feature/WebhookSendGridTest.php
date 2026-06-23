@@ -162,3 +162,79 @@ it('processes multiple SendGrid events in one request', function () {
 
     expect(MailTrackingEvent::count())->toBe(2);
 });
+
+it('rejects SendGrid event without signature headers when verification key is set', function () {
+    [, $publicKeyPem] = generateSendGridKeyPair();
+    config()->set('laravel-mail.tracking.providers.sendgrid.verification_key', $publicKeyPem);
+
+    $payload = [
+        [
+            'event' => 'delivered',
+            'email' => 'to@example.com',
+            'sg_message_id' => 'sg-signed.filter',
+            'timestamp' => time(),
+        ],
+    ];
+
+    $this->postJson('/webhooks/mail/sendgrid', $payload)->assertStatus(403);
+    expect(MailTrackingEvent::count())->toBe(0);
+});
+
+it('rejects SendGrid event with a forged signature', function () {
+    [, $publicKeyPem] = generateSendGridKeyPair();
+    config()->set('laravel-mail.tracking.providers.sendgrid.verification_key', $publicKeyPem);
+
+    $payload = [
+        [
+            'event' => 'delivered',
+            'email' => 'to@example.com',
+            'sg_message_id' => 'sg-forged.filter',
+            'timestamp' => time(),
+        ],
+    ];
+
+    $headers = [
+        'X-Twilio-Email-Event-Webhook-Signature' => base64_encode('this-is-not-a-valid-signature'),
+        'X-Twilio-Email-Event-Webhook-Timestamp' => (string) time(),
+    ];
+
+    $this->postJson('/webhooks/mail/sendgrid', $payload, $headers)->assertStatus(403);
+    expect(MailTrackingEvent::count())->toBe(0);
+});
+
+it('accepts a SendGrid event with a valid ECDSA signature', function () {
+    $mailLog = MailLog::create([
+        'subject' => 'Test',
+        'from' => [['email' => 'from@example.com', 'name' => '']],
+        'to' => [['email' => 'to@example.com', 'name' => '']],
+        'status' => MailStatus::Sent,
+        'provider_message_id' => 'sg-valid-sig',
+    ]);
+
+    [$privateKey, $publicKeyPem] = generateSendGridKeyPair();
+    config()->set('laravel-mail.tracking.providers.sendgrid.verification_key', $publicKeyPem);
+
+    $payload = [
+        [
+            'event' => 'delivered',
+            'email' => 'to@example.com',
+            'sg_message_id' => 'sg-valid-sig.filter',
+            'timestamp' => time(),
+        ],
+    ];
+
+    $timestamp = (string) time();
+    $body = json_encode($payload);
+
+    openssl_sign($timestamp.$body, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+
+    $headers = [
+        'X-Twilio-Email-Event-Webhook-Signature' => base64_encode($signature),
+        'X-Twilio-Email-Event-Webhook-Timestamp' => $timestamp,
+    ];
+
+    $this->postJson('/webhooks/mail/sendgrid', $payload, $headers)->assertOk();
+
+    expect(MailTrackingEvent::count())->toBe(1);
+    expect(MailTrackingEvent::first()->type)->toBe(TrackingEventType::Delivered);
+});

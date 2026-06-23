@@ -149,3 +149,15 @@ it('identifies unsafe urls', function () {
     expect(PixelTracker::isUrlSafe('vbscript:MsgBox("xss")'))->toBeFalse();
     expect(PixelTracker::isUrlSafe('blob:http://example.com'))->toBeFalse();
 });
+
+it('rejects open-redirect style urls', function () {
+    // Protocol-relative URLs would be parsed without a scheme and could redirect
+    // the user to an arbitrary host.
+    expect(PixelTracker::isUrlSafe('//evil.com'))->toBeFalse();
+    expect(PixelTracker::isUrlSafe('//evil.com/path'))->toBeFalse();
+
+    // Scheme-less (relative) URLs are no longer treated as safe.
+    expect(PixelTracker::isUrlSafe('/path/to/page'))->toBeFalse();
+    expect(PixelTracker::isUrlSafe('relative/page'))->toBeFalse();
+    expect(PixelTracker::isUrlSafe(''))->toBeFalse();
+});
