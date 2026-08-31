@@ -7,7 +7,7 @@
 # Laravel Mail
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/jeffersongoncalves/laravel-mail.svg?style=flat-square)](https://packagist.org/packages/jeffersongoncalves/laravel-mail)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/jeffersongoncalves/laravel-mail/run-tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/jeffersongoncalves/laravel-mail/actions?query=workflow%3Arun-tests+branch%3Amaster)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/jeffersongoncalves/laravel-mail/tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/jeffersongoncalves/laravel-mail/actions?query=workflow%3ATests+branch%3Amaster)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/jeffersongoncalves/laravel-mail/fix-php-code-style-issues.yml?branch=master&label=code%20style&style=flat-square)](https://github.com/jeffersongoncalves/laravel-mail/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amaster)
 [![Total Downloads](https://img.shields.io/packagist/dt/jeffersongoncalves/laravel-mail.svg?style=flat-square)](https://packagist.org/packages/jeffersongoncalves/laravel-mail)
 
