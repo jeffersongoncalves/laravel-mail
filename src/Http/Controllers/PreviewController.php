@@ -5,9 +5,11 @@ namespace JeffersonGoncalves\LaravelMail\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use JeffersonGoncalves\LaravelMail\Actions\PreviewTemplateAction;
 use JeffersonGoncalves\LaravelMail\Models\MailLog;
 use JeffersonGoncalves\LaravelMail\Models\MailTemplate;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PreviewController extends Controller
 {
@@ -19,6 +21,10 @@ class PreviewController extends Controller
 
         if (config('laravel-mail.preview.signed_urls', true) && ! $request->hasValidSignature()) {
             abort(403, 'Invalid signature.');
+        }
+
+        if (! Str::isUuid($mailLog)) {
+            throw new NotFoundHttpException;
         }
 
         $modelClass = config('laravel-mail.models.mail_log', MailLog::class);
@@ -37,6 +43,10 @@ class PreviewController extends Controller
 
         if (config('laravel-mail.preview.signed_urls', true) && ! $request->hasValidSignature()) {
             abort(403, 'Invalid signature.');
+        }
+
+        if (! Str::isUuid($mailTemplate)) {
+            throw new NotFoundHttpException;
         }
 
         $modelClass = config('laravel-mail.models.mail_template', MailTemplate::class);

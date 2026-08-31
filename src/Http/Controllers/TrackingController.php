@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use JeffersonGoncalves\LaravelMail\Enums\TrackingEventType;
 use JeffersonGoncalves\LaravelMail\Enums\TrackingProvider;
 use JeffersonGoncalves\LaravelMail\Models\MailLog;
@@ -73,6 +74,10 @@ class TrackingController extends Controller
 
     protected function recordOpenEvent(string $mailLogId, Request $request): void
     {
+        if (! Str::isUuid($mailLogId)) {
+            return;
+        }
+
         $modelClass = config('laravel-mail.models.mail_log', MailLog::class);
         $mailLog = $modelClass::find($mailLogId);
 
@@ -97,6 +102,10 @@ class TrackingController extends Controller
 
     protected function recordClickEvent(string $mailLogId, string $originalUrl, Request $request): void
     {
+        if (! Str::isUuid($mailLogId)) {
+            return;
+        }
+
         $modelClass = config('laravel-mail.models.mail_log', MailLog::class);
         $mailLog = $modelClass::find($mailLogId);
 
