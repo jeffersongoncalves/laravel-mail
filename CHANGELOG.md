@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-mail` will be documented in this file.
 
+## 1.3.2 - 2026-08-31
+
+### What's Changed
+
+- Implement real SNS and SendGrid signature verification
+- Guard uuid lookups against non-uuid route params: MailLog and MailTemplate use native uuid primary keys, and Postgres enforces that type strictly. Requesting a preview or tracking pixel with a non-uuid id (a probe, a stale link) previously raised a raw QueryException/500 instead of a clean 404.
+- CI now runs against sqlite, mysql, and postgres
+
+**Full Changelog**: https://github.com/jeffersongoncalves/laravel-mail/compare/1.3.1...1.3.2
+
 ## 1.3.1 - 2026-04-26
 
 **Full Changelog**: https://github.com/jeffersongoncalves/laravel-mail/compare/1.3.0...1.3.1
@@ -26,6 +36,7 @@ All notable changes to `laravel-mail` will be documented in this file.
 LARAVEL_MAIL_PIXEL_OPEN_TRACKING=true
 LARAVEL_MAIL_PIXEL_CLICK_TRACKING=true
 LARAVEL_MAIL_PIXEL_SIGNING_KEY=  # optional, defaults to APP_KEY
+
 
 
 ```
