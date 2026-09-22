@@ -1,19 +1,28 @@
-version: 2
-updates:
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    groups:
-      all-composer:
-        patterns:
-          - "*"
+# Standard Dependabot config (dependabot-std).
+# Weekly, grouped, 7-day cooldown (time to catch a malicious release).
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+version: 2
+
+updates:
+
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
+    cooldown:
+      default-days: 7
     groups:
-      all-actions:
+      actions-deps:
         patterns:
-          - "*"
+          - '*'
+
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      composer-deps:
+        patterns:
+          - '*'
