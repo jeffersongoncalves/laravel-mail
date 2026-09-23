@@ -65,12 +65,12 @@ jobs:
 
       - name: Install dependencies (Laravel 13)
         run: |
-          composer require "laravel/framework:^13.0" "orchestra/testbench:^11.0" --dev --no-interaction --no-update
+          composer require "laravel/framework:^13.0" "orchestra/testbench:^11.0" "pestphp/pest:^4.0" "pestphp/pest-plugin-laravel:^4.0" --dev --no-interaction --no-update
           composer update --prefer-stable --prefer-dist --no-interaction
 
       - name: Run tests (sqlite)
         if: matrix.database == 'sqlite'
-        run: vendor/bin/pest
+        run: vendor/bin/pest --no-coverage
 
       - name: Run tests (mysql)
         if: matrix.database == 'mysql'
@@ -81,7 +81,7 @@ jobs:
           LARAVEL_MAIL_TEST_DB_USERNAME: 'root'
           LARAVEL_MAIL_TEST_DB_PASSWORD: ''
           LARAVEL_MAIL_TEST_DB_DATABASE: 'testing'
-        run: vendor/bin/pest
+        run: vendor/bin/pest --no-coverage
 
       - name: Run tests (pgsql)
         if: matrix.database == 'pgsql'
@@ -92,4 +92,4 @@ jobs:
           LARAVEL_MAIL_TEST_DB_USERNAME: 'postgres'
           LARAVEL_MAIL_TEST_DB_PASSWORD: 'postgres'
           LARAVEL_MAIL_TEST_DB_DATABASE: 'testing'
-        run: vendor/bin/pest
+        run: vendor/bin/pest --no-coverage
