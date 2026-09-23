@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [master]
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -19,13 +22,13 @@ jobs:
       matrix:
         database: [sqlite, mysql, pgsql]
 
-    name: Tests - ${{ matrix.database }}
+    name: PHP 8.4 - Laravel 13 - ${{ matrix.database }}
 
     services:
       mysql:
-        image: mysql:8
+        image: mysql:8.4
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
           MYSQL_DATABASE: testing
         ports:
           - 3306:3306
@@ -36,7 +39,7 @@ jobs:
           --health-retries=5
 
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -44,47 +47,49 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready"
+          --health-cmd=pg_isready
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: '8.4'
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_mysql, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_mysql, pdo_pgsql, bcmath, intl, gd, exif, iconv, fileinfo
           coverage: none
 
-      - name: Install composer dependencies
-        uses: ramsey/composer-install@26d8a556604053a9612623447203a691f406fbe6 # v4
+      - name: Install dependencies (Laravel 13)
+        run: |
+          composer require "laravel/framework:^13.0" "orchestra/testbench:^11.0" --dev --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction
 
-      - name: Run Tests (sqlite)
+      - name: Run tests (sqlite)
         if: matrix.database == 'sqlite'
-        run: vendor/bin/pest --no-coverage
+        run: vendor/bin/pest
 
-      - name: Run Tests (mysql)
+      - name: Run tests (mysql)
         if: matrix.database == 'mysql'
         env:
-          LARAVEL_MAIL_TEST_DB_DRIVER: mysql
-          LARAVEL_MAIL_TEST_DB_HOST: 127.0.0.1
-          LARAVEL_MAIL_TEST_DB_PORT: 3306
-          LARAVEL_MAIL_TEST_DB_DATABASE: testing
-          LARAVEL_MAIL_TEST_DB_USERNAME: root
+          LARAVEL_MAIL_TEST_DB_DRIVER: 'mysql'
+          LARAVEL_MAIL_TEST_DB_HOST: '127.0.0.1'
+          LARAVEL_MAIL_TEST_DB_PORT: '3306'
+          LARAVEL_MAIL_TEST_DB_USERNAME: 'root'
           LARAVEL_MAIL_TEST_DB_PASSWORD: ''
-        run: vendor/bin/pest --no-coverage
+          LARAVEL_MAIL_TEST_DB_DATABASE: 'testing'
+        run: vendor/bin/pest
 
-      - name: Run Tests (pgsql)
+      - name: Run tests (pgsql)
         if: matrix.database == 'pgsql'
         env:
-          LARAVEL_MAIL_TEST_DB_DRIVER: pgsql
-          LARAVEL_MAIL_TEST_DB_HOST: 127.0.0.1
-          LARAVEL_MAIL_TEST_DB_PORT: 5432
-          LARAVEL_MAIL_TEST_DB_DATABASE: testing
-          LARAVEL_MAIL_TEST_DB_USERNAME: postgres
-          LARAVEL_MAIL_TEST_DB_PASSWORD: postgres
-        run: vendor/bin/pest --no-coverage
+          LARAVEL_MAIL_TEST_DB_DRIVER: 'pgsql'
+          LARAVEL_MAIL_TEST_DB_HOST: '127.0.0.1'
+          LARAVEL_MAIL_TEST_DB_PORT: '5432'
+          LARAVEL_MAIL_TEST_DB_USERNAME: 'postgres'
+          LARAVEL_MAIL_TEST_DB_PASSWORD: 'postgres'
+          LARAVEL_MAIL_TEST_DB_DATABASE: 'testing'
+        run: vendor/bin/pest
