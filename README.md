@@ -1,6 +1,6 @@
 <div class="filament-hidden">
 
-![Laravel Mail](https://raw.githubusercontent.com/jeffersongoncalves/laravel-mail/master/art/jeffersongoncalves-laravel-mail.png)
+![Laravel Mail](https://raw.githubusercontent.com/jeffersongoncalves/laravel-mail/main/art/jeffersongoncalves-laravel-mail.png)
 
 </div>
 
@@ -9,8 +9,8 @@
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-FFDD00?style=flat-square&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jeffersongoncalves)
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/jeffersongoncalves/laravel-mail.svg?style=flat-square)](https://packagist.org/packages/jeffersongoncalves/laravel-mail)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/jeffersongoncalves/laravel-mail/tests.yml?branch=master&label=tests&style=flat-square)](https://github.com/jeffersongoncalves/laravel-mail/actions?query=workflow%3ATests+branch%3Amaster)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/jeffersongoncalves/laravel-mail/fix-php-code-style-issues.yml?branch=master&label=code%20style&style=flat-square)](https://github.com/jeffersongoncalves/laravel-mail/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amaster)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/jeffersongoncalves/laravel-mail/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/jeffersongoncalves/laravel-mail/actions?query=workflow%3ATests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/jeffersongoncalves/laravel-mail/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/jeffersongoncalves/laravel-mail/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/jeffersongoncalves/laravel-mail.svg?style=flat-square)](https://packagist.org/packages/jeffersongoncalves/laravel-mail)
 
 Complete email management for Laravel: logging, database templates with translation (spatie/laravel-translatable), delivery tracking via webhooks (SES, SendGrid, Postmark, Mailgun, Resend), pixel tracking (provider-independent open & click tracking), suppression list, inline CSS, List-Unsubscribe headers, browser preview, statistics, notification channel, retry, attachment storage, and analytics.
