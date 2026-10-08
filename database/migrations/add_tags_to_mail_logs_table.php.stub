@@ -15,8 +15,13 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table(config('laravel-mail.database.tables.mail_logs', 'mail_logs'), function (Blueprint $table) {
-            $table->dropColumn('tags');
-        });
+        $table = config('laravel-mail.database.tables.mail_logs', 'mail_logs');
+
+        // Tolerant like the create migrations' dropIfExists: the table may already be gone (or renamed in config).
+        if (Schema::hasTable($table) && Schema::hasColumn($table, 'tags')) {
+            Schema::table($table, function (Blueprint $table) {
+                $table->dropColumn('tags');
+            });
+        }
     }
 };
