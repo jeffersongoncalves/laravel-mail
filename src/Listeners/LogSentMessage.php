@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use JeffersonGoncalves\LaravelMail\Enums\MailStatus;
 use JeffersonGoncalves\LaravelMail\Models\MailLog;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
@@ -56,6 +57,13 @@ class LogSentMessage
 
         if (! empty($metadata)) {
             $data['metadata'] = $metadata;
+        }
+
+        if (config('laravel-mail.campaigns.enabled', false)) {
+            $tags = $this->extractTags($message);
+            if ($tags !== []) {
+                $data['tags'] = $tags;
+            }
         }
 
         if (config('laravel-mail.tenant.enabled', false)) {
@@ -146,6 +154,24 @@ class LogSentMessage
 
             return $data;
         }, $attachments);
+    }
+
+    /**
+     * Mail tags (Mailable::tag(), Envelope tags) — the campaign key for laravel-mail's campaign reports.
+     *
+     * @return list<string>
+     */
+    protected function extractTags(Email $message): array
+    {
+        $tags = [];
+
+        foreach ($message->getHeaders()->all() as $header) {
+            if ($header instanceof TagHeader) {
+                $tags[] = $header->getValue();
+            }
+        }
+
+        return array_values(array_unique($tags));
     }
 
     protected function extractHeaderValue(Email $message, string $name): ?string

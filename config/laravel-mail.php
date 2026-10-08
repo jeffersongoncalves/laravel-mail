@@ -166,6 +166,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Campaigns
+    |--------------------------------------------------------------------------
+    |
+    | Record mail tags ($mailable->tag('black-friday'), Envelope tags) on the
+    | mail log so `php artisan mail:campaign` and CampaignReport can report
+    | delivery, open and click rates per campaign. Requires the
+    | add_tags_to_mail_logs_table migration.
+    |
+    */
+
+    'campaigns' => [
+        'enabled' => env('LARAVEL_MAIL_CAMPAIGNS_ENABLED', false),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Templates
     |--------------------------------------------------------------------------
     |

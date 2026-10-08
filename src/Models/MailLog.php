@@ -26,6 +26,7 @@ use JeffersonGoncalves\LaravelMail\Enums\MailStatus;
  * @property array<string, string>|null $headers
  * @property array<int, array<string, mixed>>|null $attachments
  * @property array<string, mixed>|null $metadata
+ * @property list<string>|null $tags campaign tags (when laravel-mail.campaigns.enabled)
  * @property MailStatus $status
  * @property string|null $provider_message_id
  * @property string|null $mailable_type
@@ -57,6 +58,7 @@ class MailLog extends Model
         'headers',
         'attachments',
         'metadata',
+        'tags',
         'status',
         'provider_message_id',
         'mailable_type',
@@ -76,6 +78,7 @@ class MailLog extends Model
             'headers' => 'array',
             'attachments' => 'array',
             'metadata' => 'array',
+            'tags' => 'array',
             'status' => MailStatus::class,
         ];
     }

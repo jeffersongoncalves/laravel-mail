@@ -29,6 +29,7 @@ Complete email management for Laravel: logging, database templates with translat
 - **List-Unsubscribe Headers** — Gmail/Yahoo compliance with `List-Unsubscribe` and `List-Unsubscribe-Post` headers
 - **Browser Preview** — View sent emails and templates in the browser via signed URLs
 - **Statistics** — Query helpers for sent, delivered, bounced, opened, clicked counts and daily aggregations
+- **Campaign Reports** — Delivery, open, click and click-to-open rates plus top links per campaign, keyed by Laravel's mail tags
 - **Notification Channel** — Send database templates via Laravel Notifications
 - **Retry Failed Emails** — Retry failed or soft-bounced emails with max attempts control
 - **Resend Emails** — Resend any previously sent email from the log
@@ -37,7 +38,7 @@ Complete email management for Laravel: logging, database templates with translat
 - **Polymorphic Association** — Associate mail logs with any model via `HasMailLogs` trait
 - **Multi-Tenant** — Optional tenant scoping for all tables
 - **Customizable** — Override models, table names, and database connection
-- **CLI Commands** — `mail:send-test`, `mail:templates`, `mail:stats`, `mail:prune`, `mail:retry`, `mail:unsuppress`
+- **CLI Commands** — `mail:send-test`, `mail:templates`, `mail:stats`, `mail:campaign`, `mail:prune`, `mail:retry`, `mail:unsuppress`
 
 ## Installation
 
@@ -492,6 +493,54 @@ MailStats::bounceRate($from, $to);    // float (percentage)
 MailStats::dailyStats($from, $to);    // Collection of daily aggregations
 ```
 
+## Campaign Reports
+
+A campaign is a mail tag — the same `tag()` / Envelope `tags` Laravel already supports (and SES, Postmark, Mailgun and Resend forward to their dashboards). With campaigns enabled, the tags are stored on each mail log and reported per campaign:
+
+```bash
+php artisan vendor:publish --tag=laravel-mail-migrations   # adds the add_tags_to_mail_logs_table migration
+php artisan migrate
+```
+
+```dotenv
+LARAVEL_MAIL_CAMPAIGNS_ENABLED=true
+```
+
+Tag what you send:
+
+```php
+public function envelope(): Envelope
+{
+    return new Envelope(subject: 'Black Friday', tags: ['black-friday-2026']);
+}
+
+// or on any mailable instance
+Mail::to($user)->send((new PromoMail)->tag('black-friday-2026'));
+```
+
+Then read the numbers:
+
+```bash
+php artisan mail:campaign                       # every campaign of the last 30 days
+php artisan mail:campaign black-friday-2026     # one campaign + its most clicked links
+php artisan mail:campaign --days=0              # all time
+```
+
+```php
+use JeffersonGoncalves\LaravelMail\Campaigns\CampaignReport;
+
+$report = app(CampaignReport::class);
+
+$report->tags($from, $to);                      // ['black-friday-2026', 'newsletter', ...]
+$stats = $report->stats('black-friday-2026');    // CampaignStats
+$stats->sent; $stats->delivered; $stats->opened; $stats->clicked; $stats->bounced; $stats->complained;
+$stats->openRate(); $stats->clickRate(); $stats->clickToOpenRate(); $stats->bounceRate();
+$stats->links;                                   // ['https://…' => ['clicks' => 12, 'unique' => 9], ...]
+$report->all($from, $to);                        // CampaignStats for every campaign
+```
+
+Opens and clicks count distinct emails, so the rates read as "% of sent emails". They come from pixel tracking or provider webhooks — enable at least one of them.
+
 ## Notification Channel
 
 Send database templates via Laravel Notifications:
@@ -629,6 +678,7 @@ Schedule::command('mail:prune')->daily();
 | `mail:send-test {key} {email}` | Send a test email using a template (supports `--locale`, `--data`) |
 | `mail:templates` | List all mail templates in a table |
 | `mail:stats` | Show email statistics (supports `--days`) |
+| `mail:campaign {tag?}` | Show rates per campaign, or one campaign with its top links (supports `--days`, `--links`) |
 
 ### Send Test Email
 

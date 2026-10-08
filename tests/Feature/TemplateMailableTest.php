@@ -141,3 +141,23 @@ it('respects locale for template content', function () {
     expect($template->getSubjectForLocale())->toBe('Bem-vindo!')
         ->and($template->getHtmlBodyForLocale())->toBe('<h1>Olá {{ $name }}</h1>');
 });
+
+it('sends the rendered text body of the template', function () {
+    config()->set('mail.default', 'array');
+
+    MailTemplate::create([
+        'key' => 'welcome',
+        'name' => 'Welcome Email',
+        'subject' => ['en' => 'Welcome'],
+        'html_body' => ['en' => '<h1>Hello {{ $name }}</h1>'],
+        'text_body' => ['en' => 'Hello {{ $name }}, plain text.'],
+        'is_active' => true,
+    ]);
+
+    Mail::to('jane@example.com')->send(new WelcomeTestMailable('Jane'));
+
+    $message = app('mailer')->getSymfonyTransport()->messages()->first()->getOriginalMessage();
+
+    expect($message->getTextBody())->toBe('Hello Jane, plain text.')
+        ->and($message->getHtmlBody())->toContain('Hello Jane');
+});

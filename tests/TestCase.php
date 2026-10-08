@@ -20,6 +20,7 @@ class TestCase extends Orchestra
         'create_mail_template_versions_table',
         'create_mail_tracking_events_table',
         'create_mail_suppressions_table',
+        'add_tags_to_mail_logs_table',
     ];
 
     protected function setUp(): void

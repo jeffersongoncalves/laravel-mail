@@ -6,7 +6,9 @@ use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use JeffersonGoncalves\LaravelMail\Campaigns\CampaignReport;
 use JeffersonGoncalves\LaravelMail\Commands\ListTemplatesCommand;
+use JeffersonGoncalves\LaravelMail\Commands\MailCampaignCommand;
 use JeffersonGoncalves\LaravelMail\Commands\MailStatsCommand;
 use JeffersonGoncalves\LaravelMail\Commands\PruneMailLogsCommand;
 use JeffersonGoncalves\LaravelMail\Commands\RetryFailedMailCommand;
@@ -37,6 +39,7 @@ class LaravelMailServiceProvider extends PackageServiceProvider
                 SendTestMailCommand::class,
                 ListTemplatesCommand::class,
                 MailStatsCommand::class,
+                MailCampaignCommand::class,
             ])
             ->hasMigrations([
                 'create_mail_logs_table',
@@ -44,6 +47,7 @@ class LaravelMailServiceProvider extends PackageServiceProvider
                 'create_mail_template_versions_table',
                 'create_mail_tracking_events_table',
                 'create_mail_suppressions_table',
+                'add_tags_to_mail_logs_table',
             ]);
     }
 
@@ -56,6 +60,8 @@ class LaravelMailServiceProvider extends PackageServiceProvider
         $this->app->singleton('laravel-mail-stats', function () {
             return new MailStats;
         });
+
+        $this->app->singleton(CampaignReport::class);
     }
 
     public function packageBooted(): void

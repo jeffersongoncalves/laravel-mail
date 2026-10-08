@@ -8,7 +8,6 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\HtmlString;
 use JeffersonGoncalves\LaravelMail\Models\MailTemplate;
 use Symfony\Component\Mime\Email;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
@@ -67,7 +66,9 @@ abstract class TemplateMailable extends Mailable
 
         $textBody = $template->getTextBodyForLocale();
         if ($textBody) {
-            $this->text(new HtmlString($this->renderBlade($textBody, $data)));
+            // Already-rendered text, not a view name: set it on the message directly.
+            $renderedText = $this->renderBlade($textBody, $data);
+            $this->withSymfonyMessage(fn (Email $message) => $message->text($renderedText));
         }
 
         return new Content;
