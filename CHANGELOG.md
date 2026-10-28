@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-mail` will be documented in this file.
 
+## 1.4.1 - 2026-10-28
+
+Tests now load the package migrations with jeffersongoncalves/pest-plugin-database-migrations, in the order declared by the service provider, instead of copying the .php.stub files by hand. No runtime changes.
+
 ## 1.4.0 - 2026-10-07
 
 Campaign reports: with `laravel-mail.campaigns.enabled`, mail tags (`tag()` / Envelope `tags`) are stored on the log (publish and run the new `add_tags_to_mail_logs_table` migration). `CampaignReport` and `php artisan mail:campaign [tag]` report sent, delivered, bounced, complained, distinct opens and clicks, open / click / click-to-open rates and the most clicked links per campaign.
@@ -42,6 +46,7 @@ Fix: template text bodies are set on the message directly instead of being passe
 LARAVEL_MAIL_PIXEL_OPEN_TRACKING=true
 LARAVEL_MAIL_PIXEL_CLICK_TRACKING=true
 LARAVEL_MAIL_PIXEL_SIGNING_KEY=  # optional, defaults to APP_KEY
+
 
 
 
