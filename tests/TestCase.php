@@ -5,23 +5,13 @@ namespace JeffersonGoncalves\LaravelMail\Tests;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use JeffersonGoncalves\LaravelMail\LaravelMailServiceProvider;
+use JeffersonGoncalves\PestPluginDatabaseMigrations\LoadsPackageMigrations;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+    use LoadsPackageMigrations;
     use RefreshDatabase;
-
-    /**
-     * Same order as LaravelMailServiceProvider::hasMigrations().
-     */
-    private const MIGRATION_ORDER = [
-        'create_mail_logs_table',
-        'create_mail_templates_table',
-        'create_mail_template_versions_table',
-        'create_mail_tracking_events_table',
-        'create_mail_suppressions_table',
-        'add_tags_to_mail_logs_table',
-    ];
 
     protected function setUp(): void
     {
@@ -78,17 +68,6 @@ class TestCase extends Orchestra
 
     protected function defineDatabaseMigrations(): void
     {
-        $stubsPath = __DIR__.'/../database/migrations';
-        $tempPath = sys_get_temp_dir().'/laravel-mail-migrations';
-
-        if (! is_dir($tempPath)) {
-            mkdir($tempPath, 0755, true);
-        }
-
-        foreach (self::MIGRATION_ORDER as $index => $name) {
-            copy($stubsPath.'/'.$name.'.php.stub', $tempPath.'/'.sprintf('%03d_%s.php', $index, $name));
-        }
-
-        $this->loadMigrationsFrom($tempPath);
+        $this->loadPackageMigrations(LaravelMailServiceProvider::class);
     }
 }
